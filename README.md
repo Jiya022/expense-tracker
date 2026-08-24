@@ -40,25 +40,6 @@ Users can register, log in, add transactions, and view dynamic reports for expen
 
 ---
 
-## Installation
-
-1. Clone the repository:
-```bash
-git clone https://github.com/Jerrwin/Expense-Tracker.git
-```
-2. Import the backend Spring Boot project in IntelliJ IDEA.
-3. Set up MySQL database using MySQL Workbench:
-```bash
-CREATE DATABASE expense_tracker;
-```
-  Update application.properties with your database credentials.
-
-4. Run the Spring Boot backend application (it will start on http://localhost:8080 by default).  
-5. Open the frontend folder (`Expense-Tracker-Frontend/`) in VS Code or any code editor.  
-6. Open the HTML files in your browser or use a live server extension to view the app.  
-
----
-
 ## Contributing
 
 Feel free to fork the repo, submit issues, or create pull requests.  

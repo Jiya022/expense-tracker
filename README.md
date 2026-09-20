@@ -10,6 +10,19 @@ Users can register, log in, add transactions, and view a dynamic balance, income
 
 ---
 
+## Application Preview
+
+### Login Page
+![Login Page](Screenshots/login.png)
+
+### Registration Page
+![Registration Page](Screenshots/register.png)
+
+### Expense Dashboard
+![Expense Dashboard](Screenshots/dashboard.png)
+
+---
+
 ## Features
 
 ### User
@@ -122,6 +135,10 @@ Expense-Tracker/
 │   └── ExpenseTrackerApplication.java
 ├── src/main/resources/
 │   └── application.properties   # not committed — create this yourself
+├── Screenshots/
+│   ├── login.png
+│   ├── register.png
+│   └── dashboard.png
 └── Expense-Tracker-Frontend/
     ├── login.html
     ├── register.html

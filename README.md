@@ -6,20 +6,20 @@
 [![Frontend](https://img.shields.io/badge/Frontend-HTML/CSS/JS-yellow)](#)
 
 A **full-stack Expense Tracker application** built with **Spring Boot**, **MySQL**, and **JavaScript**.
-Users can register, log in, add transactions, and view a dynamic balance, income, and expense report.
+Users can register, log in, add/edit/delete transactions by category, and view a dynamic balance, income, and expense report.
 
 ---
 
 ## Application Preview
 
 ### Login Page
-![Login Page](Screenshots/login.png)
+![Login Page](Screenshots/Login.png)
 
 ### Registration Page
-![Registration Page](Screenshots/register.png)
+![Registration Page](Screenshots/Register.png)
 
 ### Expense Dashboard
-![Expense Dashboard](Screenshots/dashboard.png)
+![Expense Dashboard](Screenshots/Dashboard.png)
 
 ---
 
@@ -27,20 +27,29 @@ Users can register, log in, add transactions, and view a dynamic balance, income
 
 ### User
 - Register and log in
-- Add income and expense transactions (positive amount = income, negative = expense)
-- View transaction history
-- See a dynamically calculated balance, income, and expense total
-- Delete individual transactions
+- Add income and expense transactions, selected via an Income/Expense toggle
+- Categorize transactions (Salary, Food, Rent, Entertainment, Other)
+- Filter transaction history by category
+- Edit an existing transaction
+- Delete individual transactions (with a confirmation prompt)
+- See balance, income, and expense totals calculated by the backend
+- Friendly empty-state message when no transactions exist yet
 
 ### Backend
-- RESTful APIs for user authentication and transaction management
+- RESTful APIs for user authentication and transaction management (7 endpoints)
 - Layered architecture: Controller → Service → Repository → Database
+- DTOs (Data Transfer Objects) separate the API contract from the database entities — internal fields like the hashed password are never exposed in API responses
+- Passwords hashed with **BCrypt** before storage — never stored or compared in plain text
+- Balance, income, and expense totals calculated **server-side** via a dedicated summary endpoint, rather than in the browser
+- Centralized error handling via `@ControllerAdvice`, returning clean, consistent JSON error responses
+- Basic input validation on registration and transaction creation
 - MySQL database integration via Spring Data JPA / Hibernate
-- Tables (`users`, `transaction`) auto-created on first run via `spring.jpa.hibernate.ddl-auto=update`
+- Tables (`users`, `transaction`) auto-created and updated via `spring.jpa.hibernate.ddl-auto=update`
 
 ### Frontend
 - Static HTML pages with CSS styling and vanilla JavaScript (no framework)
-- Forms for login, registration, and adding transactions
+- Two-column dashboard layout (summary + form on the left, transaction history on the right)
+- Forms for login, registration, and adding/editing transactions
 - Session persistence via browser `localStorage`
 
 ---
@@ -49,7 +58,7 @@ Users can register, log in, add transactions, and view a dynamic balance, income
 
 | Layer | Technology |
 |---|---|
-| Backend | Java 17+, Spring Boot 3.5.x, Spring Data JPA |
+| Backend | Java 17+, Spring Boot 3.5.x, Spring Data JPA, Spring Security Crypto (BCrypt) |
 | Frontend | HTML, CSS, JavaScript (vanilla) |
 | Database | MySQL |
 | DB Client | **DBeaver** (used for creating and inspecting the database) |
@@ -110,7 +119,7 @@ mvn spring-boot:run
 The server starts on **http://localhost:8080**.
 
 ### 5. Verify the tables in DBeaver
-Refresh the `expense_tracker` database in DBeaver — you should now see the `users` and `transaction` tables, auto-created with the correct columns and a foreign key linking them.
+Refresh the `expense_tracker` database in DBeaver — you should now see the `users` and `transaction` tables, auto-created with the correct columns (including `category`) and a foreign key linking them.
 
 ### 6. Run the frontend
 Open `Expense-Tracker-Frontend/register.html` directly in a browser, or serve the folder for a smoother experience:
@@ -128,10 +137,12 @@ Register a user, log in, and start adding transactions.
 Expense-Tracker/
 ├── pom.xml
 ├── src/main/java/.../Tracker/
-│   ├── model/          # User, Transaction entity classes
-│   ├── repository/     # Spring Data JPA repositories
-│   ├── service/        # Business logic
-│   ├── controller/     # REST API endpoints
+│   ├── dto/             # Request/response DTOs (API contract, separate from entities)
+│   ├── exception/       # Global exception handler
+│   ├── model/           # User, Transaction entity classes
+│   ├── repository/      # Spring Data JPA repositories
+│   ├── service/         # Business logic (interface + implementation for each)
+│   ├── controller/      # REST API endpoints
 │   └── ExpenseTrackerApplication.java
 ├── src/main/resources/
 │   └── application.properties   # not committed — create this yourself
@@ -153,16 +164,28 @@ Expense-Tracker/
 
 | Method | Endpoint | Description |
 |---|---|---|
-| POST | `/ExpTrack/register` | Register a new user |
+| POST | `/ExpTrack/register` | Register a new user (password is hashed with BCrypt before storage) |
 | POST | `/ExpTrack/login` | Log in with username + password |
 | GET | `/ExpTrack/transactions/{username}` | Get all transactions for a user |
+| GET | `/ExpTrack/transactions/{username}/category/{category}` | Get a user's transactions filtered by category |
+| GET | `/ExpTrack/transactions/{username}/summary` | Get calculated balance, income, and expense totals for a user |
 | POST | `/ExpTrack/transactions/{username}` | Add a transaction for a user |
+| PUT | `/ExpTrack/transactions/{username}/{id}` | Update an existing transaction |
 | DELETE | `/ExpTrack/transactions/{username}/{id}` | Delete a specific transaction |
 
 ---
 
 ## Known Limitations
 
-- Passwords are stored in plain text — not hashed (e.g. with BCrypt).
-- No token-based authentication (e.g. JWT); the frontend simply stores the username in `localStorage` and the backend trusts it.
-- Balance/income/expense totals are calculated client-side in JavaScript, not stored or computed by the backend.
+- No token-based authentication (e.g. JWT); the frontend stores the username in `localStorage` and the backend trusts it as-is. This is a deliberate scope decision for now — the fix would be issuing a signed JWT on login and validating it server-side on every request, rather than trusting a client-supplied username.
+- No pagination on transaction history — all transactions load at once.
+- No automated unit tests beyond the default Spring Boot application context test.
+
+---
+
+## Possible Future Improvements
+
+- JWT-based authentication, replacing the current username-trust model
+- Pagination on transaction history for large datasets
+- Unit tests for the service layer (JUnit + Mockito)
+- Structured logging (SLF4J) across the service layer

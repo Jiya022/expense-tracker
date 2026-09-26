@@ -2,6 +2,7 @@ package com.example.Expense.Tracker.service;
 
 import com.example.Expense.Tracker.dto.TransactionRequest;
 import com.example.Expense.Tracker.dto.TransactionResponse;
+import com.example.Expense.Tracker.dto.TransactionSummaryResponse;
 import com.example.Expense.Tracker.model.Transaction;
 import com.example.Expense.Tracker.model.User;
 import com.example.Expense.Tracker.repository.TransactionRepository;
@@ -91,4 +92,28 @@ public class TransactionServiceImpl implements TransactionService {
         response.setCategory(transaction.getCategory());
         return response;
     }
+
+    @Override
+    public TransactionSummaryResponse getSummary(String username) {
+        List<Transaction> userTransactions = transactionRepository.findByUserUsername(username);
+
+        double income = userTransactions.stream()
+                .mapToDouble(Transaction::getAmount)
+                .filter(a -> a > 0)
+                .sum();
+
+        double expense = userTransactions.stream()
+                .mapToDouble(Transaction::getAmount)
+                .filter(a -> a < 0)
+                .sum();
+
+        double balance = income + expense; // expense is already negative, so this is a net sum
+
+        TransactionSummaryResponse summary = new TransactionSummaryResponse();
+        summary.setIncome(income);
+        summary.setExpense(Math.abs(expense)); // display as a positive number
+        summary.setBalance(balance);
+        return summary;
+    }
+
 }

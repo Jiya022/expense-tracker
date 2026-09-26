@@ -37,21 +37,15 @@ typeExpenseBtn.addEventListener("click", () => setType("expense"));
 
 // ---------- Totals ----------
 function updateValues() {
-    const amounts = transactions.map((t) => t.amount);
-    const total = amounts.reduce((acc, item) => acc + item, 0).toFixed(2);
-    const incomeTotal = amounts
-        .filter((a) => a > 0)
-        .reduce((acc, item) => acc + item, 0)
-        .toFixed(2);
-    const expenseTotal = (
-        amounts.filter((a) => a < 0).reduce((acc, item) => acc + item, 0) * -1
-    ).toFixed(2);
-
-    balance.textContent = `₹${total}`;
-    income.textContent = `₹${incomeTotal}`;
-    expense.textContent = `₹${expenseTotal}`;
+    fetch(`http://localhost:8080/ExpTrack/transactions/${username}/summary`)
+        .then((res) => res.json())
+        .then((data) => {
+            balance.textContent = `₹${data.balance.toFixed(2)}`;
+            income.textContent = `₹${data.income.toFixed(2)}`;
+            expense.textContent = `₹${data.expense.toFixed(2)}`;
+        })
+        .catch((err) => alert("Failed to load summary: " + err.message));
 }
-
 // ---------- Render rows ----------
 function addTransactionDOM(transaction) {
     const tr = document.createElement("tr");

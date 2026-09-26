@@ -2,6 +2,7 @@ package com.example.Expense.Tracker.controller;
 
 import com.example.Expense.Tracker.dto.TransactionRequest;
 import com.example.Expense.Tracker.dto.TransactionResponse;
+import com.example.Expense.Tracker.dto.TransactionSummaryResponse;
 import com.example.Expense.Tracker.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -40,5 +41,10 @@ public class TransactionController {
     public TransactionResponse updateTransaction(@PathVariable String username, @PathVariable Long id,
                                                  @RequestBody TransactionRequest request) {
         return transactionService.updateTransaction(id, username, request);
+    }
+
+    @GetMapping("/{username}/summary")
+    public TransactionSummaryResponse getSummary(@PathVariable String username) {
+        return transactionService.getSummary(username);
     }
 }

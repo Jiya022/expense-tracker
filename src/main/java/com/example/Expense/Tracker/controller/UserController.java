@@ -1,10 +1,10 @@
 package com.example.Expense.Tracker.controller;
 
-import com.example.Expense.Tracker.model.User;
+import com.example.Expense.Tracker.dto.LoginRequest;
+import com.example.Expense.Tracker.dto.RegisterRequest;
+import com.example.Expense.Tracker.dto.UserResponse;
 import com.example.Expense.Tracker.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,18 +16,12 @@ public class UserController {
     UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody User user) {
-        try {
-            User savedUser = userService.registerUser(user);
-            return ResponseEntity.ok(savedUser);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+    public UserResponse register(@RequestBody RegisterRequest request) {
+        return userService.registerUser(request);
     }
 
     @PostMapping("/login")
-    public User login(@RequestBody User user) {
-        return userService.login(user.getUsername(), user.getPassword());
+    public UserResponse login(@RequestBody LoginRequest request) {
+        return userService.login(request.getUsername(), request.getPassword());
     }
-
 }

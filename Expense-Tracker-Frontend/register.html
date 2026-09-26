@@ -103,8 +103,14 @@
         });
 
         if (!response.ok) {
-          const errorData = await response.text();
-          alert("Error: " + errorData); // Backend sends plain error
+          let message = "Something went wrong. Please try again.";
+          try {
+            const errorData = await response.json();
+            message = errorData.error || message;
+          } catch (e) {
+            // response wasn't valid JSON, keep the default message
+          }
+          alert(message);
           return;
         }
 

@@ -92,11 +92,16 @@
         });
 
         if (!response.ok) {
-          const errorData = await response.json();
-          alert(errorData.message); // Backend sends plain error
+          let message = "Invalid username or password. Please try again.";
+          try {
+            const errorData = await response.json();
+            message = errorData.error || message;
+          } catch (e) {
+            // response wasn't valid JSON, keep the default message
+          }
+          alert(message);
           return;
         }
-
         const data = await response.json();
         console.log(data.username);
         localStorage.setItem("user", data.username);

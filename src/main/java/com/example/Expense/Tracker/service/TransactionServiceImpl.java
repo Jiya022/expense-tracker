@@ -35,6 +35,7 @@ public class TransactionServiceImpl implements TransactionService {
         transaction.setText(request.getText());
         transaction.setAmount(request.getAmount());
         transaction.setDate(request.getDate());
+        transaction.setCategory(request.getCategory());
         transaction.setUser(user);
 
         Transaction saved = transactionRepository.save(transaction);
@@ -44,6 +45,14 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public List<TransactionResponse> getAllTransactions(String username) {
         return transactionRepository.findByUserUsername(username)
+                .stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<TransactionResponse> getTransactionsByCategory(String username, String category) {
+        return transactionRepository.findByUserUsernameAndCategory(username, category)
                 .stream()
                 .map(this::toResponse)
                 .collect(Collectors.toList());
@@ -68,17 +77,18 @@ public class TransactionServiceImpl implements TransactionService {
         existing.setText(request.getText());
         existing.setAmount(request.getAmount());
         existing.setDate(request.getDate());
+        existing.setCategory(request.getCategory());
         Transaction updated = transactionRepository.save(existing);
         return toResponse(updated);
     }
 
-    // Helper to convert entity -> response DTO
     private TransactionResponse toResponse(Transaction transaction) {
         TransactionResponse response = new TransactionResponse();
         response.setId(transaction.getId());
         response.setText(transaction.getText());
         response.setAmount(transaction.getAmount());
         response.setDate(transaction.getDate());
+        response.setCategory(transaction.getCategory());
         return response;
     }
 }

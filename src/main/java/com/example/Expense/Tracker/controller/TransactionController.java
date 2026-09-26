@@ -26,6 +26,11 @@ public class TransactionController {
         return transactionService.getAllTransactions(username);
     }
 
+    @GetMapping("/{username}/category/{category}")
+    public List<TransactionResponse> getTransactionsByCategory(@PathVariable String username, @PathVariable String category) {
+        return transactionService.getTransactionsByCategory(username, category);
+    }
+
     @DeleteMapping("/{username}/{id}")
     public void deleteTransaction(@PathVariable String username, @PathVariable Long id) {
         transactionService.deleteTransaction(id, username);

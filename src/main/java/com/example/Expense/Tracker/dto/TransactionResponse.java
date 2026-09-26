@@ -9,5 +9,5 @@ public class TransactionResponse {
     private String text;
     private double amount;
     private LocalDate date;
-    // no "user" field here — the frontend never needs the full owning user object
+    private String category;
 }

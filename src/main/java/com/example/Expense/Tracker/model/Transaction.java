@@ -21,6 +21,8 @@ public class Transaction {
 
     private LocalDate date;
 
+    private String category;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     @JsonBackReference
